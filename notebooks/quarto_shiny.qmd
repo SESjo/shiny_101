@@ -1,0 +1,151 @@
+---
+title: "TDR Data"
+format:
+  html:
+    embed-resources: true
+    toc: true
+    toc-location: left
+    number-sections: true
+    smooth-scroll: true
+    code-fold: true
+    code-tools: true
+    df-print: kable
+    fig-align: "center"
+    tbl-align: "center"
+    highlight-style: arrow
+    self-contained: true
+execute: 
+  cache: false
+  warning: false
+theme:
+  light: flatly
+  dark: darkly
+knitr:
+  opts_chunk:
+    message: false
+    rownames.print: false
+    tidy: styler
+server: shiny
+---
+
+# Shiny within an quarto document
+
+Here is an example of an R Shiny app included within a quarto document.
+
+```{r}
+#| context: setup
+
+# load packages
+library(shiny)
+library(dplyr)
+library(ggplot2)
+
+# load data
+data_tdr = read.csv2("https://raw.githubusercontent.com/SESjo/shiny_101/main/export/data_tdr.csv",
+                     colClasses = c("integer",
+                                    "POSIXct",
+                                    "integer",
+                                    "character",
+                                    "numeric"))
+```
+
+
+```{r}
+#| panel: sidebar
+
+# sliderInput to choose the number of dives
+sliderInput(inputId = "nb_dives",
+            label = "Number of dives:",
+            min = 1,
+            max = 10,
+            value = 1)
+
+# radioButtons to decide the color code
+radioButtons(inputId = "color_code",
+             label = "Color code:",
+             choices = c("Yes", "No"),
+             selected = c("No"))
+
+# checkboxGroupInput to select dive types
+checkboxGroupInput(inputId = "dive_type", 
+                   label = "Dive types:", 
+                   choices = unique(data_tdr$dive_type),
+                   selected = unique(data_tdr$dive_type))
+```
+
+```{r}
+#| panel: fill
+# plotOutput to display main_plot
+plotOutput(outputId = "main_plot")
+```
+
+
+```{r}
+#| context: server
+
+# store the plot
+output$main_plot <- renderPlot({
+  
+  # from data_tdr
+  data_tdr %>% 
+    # filter on the number of dives
+    filter(dive_number <= input$nb_dives) %>%
+    # filter on the dive type
+    filter(dive_type %in% input$dive_type) %>%
+    # initiate a plot
+    ggplot(aes(x = datetime, 
+               y = depth,
+               group = dive_number))+
+    # which going to be a geom_path = line plot
+    geom_path(
+      # if color_code == Yes
+      mapping = if(input$color_code == "Yes"){
+        # then use dive_type as color_code
+        aes(col = dive_type)
+      }
+    ) +
+    ### everything below is optional ###
+    # tweak y axis
+    scale_y_reverse(
+      # a proper name
+      name = "Depth (m)",
+      # fix the limits, note: use rev because we reversed the y axis
+      limits = rev(range(data_tdr$depth))) +
+    # tweak x axis
+    scale_x_datetime(
+      # a proper name
+      name = "Time",
+      # ticks frequency
+      date_breaks = "20 mins",
+      # format of labels
+      date_labels = "%H:%M",
+      # position
+      position = "top",
+      # fix the limits
+      limits = range(data_tdr$datetime)) +
+    # tweak color
+    scale_color_manual(
+      # fix color for each dive type
+      values = c(Forage = "#00AFBB", 
+                 Transit = "#E7B800", 
+                 Drift = "#FC4E07")) +
+    # rename title of the legend
+    labs(col = "Dive Type") +
+    # choose a theme
+    theme_minimal() +
+    # and tweak it
+    theme(
+      # legend position
+      legend.position = "bottom",
+      # add arrow for x axis
+      axis.line.x = element_line(arrow = arrow(
+        ends = "last",
+        type = "closed",
+        length = unit(0.25, "npc"))),
+      # add arrow for y axis
+      axis.line.y = element_line(arrow = arrow(
+        ends = "first",
+        type = "closed",
+        length = unit(0.25, "npc"))))
+})
+```
