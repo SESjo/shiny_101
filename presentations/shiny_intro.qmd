@@ -232,7 +232,7 @@ The app
 
 ## Practice - Your turn{.smaller}
 
-1. Create a new script: File > New File > R Script
+1. Create a new script: `File > New File > R Script`
 2. Paste the code below
 3. Save it
 4. Fill the `####### TO BE COMPLETED ########` sections
@@ -245,7 +245,12 @@ library(dplyr)
 library(ggplot2)
 
 # load data
-data_tdr = readRDS("../export/data_tdr.rds")
+data_tdr = read.csv2("https://raw.githubusercontent.com/SESjo/shiny_101/main/export/data_tdr.csv",
+                     colClasses = c("integer",
+                                    "POSIXct",
+                                    "integer",
+                                    "character",
+                                    "numeric"))
 
 # define UI for the application
 ui <- fluidPage(
@@ -365,9 +370,9 @@ shinyApp(ui = ui, server = server)
 ```
 
 
-## Publish
+## Share your app
 
--   ShinyProxy
+-   [https://www.shinyapps.io/](https://www.shinyapps.io/)
 -   within a quarto/rmarkdown document
 
 ## Alternatives
