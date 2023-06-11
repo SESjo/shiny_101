@@ -4,7 +4,12 @@ library(dplyr)
 library(ggplot2)
 
 # load data
-data_tdr = readRDS("../export/data_tdr.rds")
+data_tdr = read.csv2("https://raw.githubusercontent.com/SESjo/shiny_101/main/export/data_tdr.csv",
+                     colClasses = c("integer",
+                                    "POSIXct",
+                                    "integer",
+                                    "character",
+                                    "numeric"))
 
 # define UI for the application
 ui <- fluidPage(
