@@ -30,7 +30,7 @@ server: shiny
 
 # Shiny within an quarto document
 
-Here is an example of an R Shiny app included within a quarto document.
+Here is an example of an R Shiny app within a quarto document.
 
 ```{r}
 #| context: setup
