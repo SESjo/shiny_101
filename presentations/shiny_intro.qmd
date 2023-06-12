@@ -5,6 +5,7 @@ bibliography: references.bib
 self-contained: true
 institute: "Beltran lab"
 date: "2023-06-12"
+df-print: kable
 ---
 
 ## Disclaimer {.smaller}
@@ -47,7 +48,7 @@ Highly inspired by [Mastering Shiny](https://mastering-shiny.org/index.html) [^1
 
 ## Structure
 
-``` {.r code-line-numbers="|4,5,6,7|10,11,12"}
+``` {.r code-line-numbers="|1,2,3|4,5,6,7|10,11,12|15"}
 library(shiny)                        # <1>
 
 ui <- fluidPage(                      # <2>
@@ -66,11 +67,28 @@ shinyApp(ui = ui, server = server)    # <4>
 3.  Back end, to define the server logic
 4.  Simply run the application
 
+## User Interface
+
+Always within a layout function (*e.g* `fluidPage()`) that sets up the basic visual structure of the page with:
+
+* `input` controls that let the user interact with the app by providing information, like a value or a number
+* `output` controls that tell Shiny where to put rendered output
+
+``` {.r}
+ui <- fluidPage(                      
+  selectInput(inputId = "dataset", 
+              label = "Dataset", 
+              choices = c("data_tdr", "other")),
+  tableOutput(outputId = "table")
+)                                     
+```
+
 ## User Interface {.smaller}
 
--   `Inputs`[^2]: functions use to insert input controls into your UI specification
-    -   `inputId` argument: identifier to connect the front end with the back end (*e.g.* if `inputId = 'name'`, the server function will access it with `input$name`)
-    -   `label` argument: title of your input in the user interface
+`Inputs`[^2] are functions used to insert input controls into your UI specification, and usually have at least these two arguments:
+
+-   `inputId`: identifier to connect the front end with the back end (*e.g.* if `inputId = 'num'`, the server function will access it with `input$num`)
+-   `label`: title of your input in the user interface
 
 [^2]: *e.g.* `sliderInput()`, `radioButtons()`, `checkboxGroupInput()`, more here: <https://mastering-shiny.org/basic-ui.html#inputs>
 
@@ -82,15 +100,22 @@ ui <- fluidPage(
 )
 ```
 
+![](https://i.imgur.com/YFX4Olo.png)
+
 ## User Interface {.smaller}
 
--   `Outputs`[^3]: functions use to insert placeholders that are later filled by the server function
-    -   `outputId` argument: identifier to connect the front end with the back end (*e.g.* if `outputId = 'plot'`, the server function will update it with `output$plot`)
-    -   Each output function on the front end is coupled with a render function in the back end[^4].
+`Outputs`[^3] are functions used to insert placeholders that are later filled by the server function.
 
-[^3]: mainly `plotOutput`, `textOutput()` and `tableOutput()`, more here: <https://mastering-shiny.org/basic-ui.html#outputs>
+-   `outputId` argument: identifier to connect the front end with the back end (*e.g.* if `outputId = 'plot'`, the server function will update it with `output$plot`)
+-   Each output function on the front end is coupled with a render function in the back end[^4].
 
-[^4]: `renderPlot`, `renderText` and `renderTable`
+[^3]: `plotOutput()`, `textOutput()` and `tableOutput()`
+
+[^4]: `renderPlot()`, `renderText()` and `renderTable()`
+
+:::{.aside}
+More here: <https://mastering-shiny.org/basic-ui.html#outputs>
+:::
 
 ``` r
 ui <- fluidPage(
@@ -113,39 +138,13 @@ writing a script *vs.* reactive programming
 «The key idea of reactive programming is to specify a graph of dependencies so that when an **input** changes, all related **outputs** are automatically updated»^[[https://mastering-shiny.org/basic-reactivity.html](https://mastering-shiny.org/basic-reactivity.html)]
 :::
 
-## Server Logic
-
-* the `server()` function
-  - take three parameters: `input`, `output` and `session`
-  - since you never call the `server()` function yourself, you’ll never create these objects yourself
-  
 ## Server Logic{.smaller}
 
-* the `input` argument
-  - list-like object that contains all the input data sent from the user interface
-  - To read from an `input`, you must be in a reactive context created by a function like `renderText()`
+  - The `server()` function takes three parameters: `input`, `output` and `session`
+  - The `input` and `output` are list-like objects that contain respectively all the input data sent from the user interface and all the output from the `server()`
+  - Always use the `output` object in concert with a `render()` function
   
-```{.r}
-ui <- fluidPage(
-  numericInput(inputId = "count", 
-               label = "Number of values", 
-               value = 100)
-)
-server <- function(input, output, session) {
-  message("The value of input$count is ", input$count)
-}
-
-shinyApp(ui, server)
-#> Error: Can't access reactive value 'count' outside of reactive consumer.
-#> ℹ Do you need to wrap inside reactive() or observer()?
-```
-
-
-## Server Logic{.smaller}
-
-* the `input` argument
-  - list-like object that contains all the input data sent from the user interface
-  - To read from an `input`, you must be in a reactive context created by a function like `renderText()`
+. . .
   
 ```{.r}
 ui <- fluidPage(
@@ -155,30 +154,14 @@ ui <- fluidPage(
   textOutput(outputId = "message")
 )
 server <- function(input, output, session) {
-  output$message("The value of input$count is ", input$count)
-}
-
-shinyApp(ui, server)
-```
-
-## Server Logic{.smaller}
-
-* the `output` argument
- - it’s also a list-like object named according to the output ID
- - it's used for sending output instead of receiving input
- - always use the `output` object in concert with a `render()` function
- 
-```{.r}
-ui <- fluidPage(
-  textOutput("greeting")
-)
-
-server <- function(input, output, session) {
-  output$greeting <- renderText("Hello human!")
+  output$message <- renderText(
+    paste("The value of input$count is ", input$count))
 }
 ```
 
-## Practice
+![](https://i.imgur.com/6oLLCYW.png)
+
+## Practice{.smaller}
 
 The dataset
 
@@ -370,15 +353,81 @@ shinyApp(ui = ui, server = server)
 ```
 
 
-## Share your app
+## Showcase your app
 
--   [https://www.shinyapps.io/](https://www.shinyapps.io/)
--   within a quarto/rmarkdown document
+-   with a URL thanks to [https://www.shinyapps.io/](https://www.shinyapps.io/)
+-   within a quarto/rmarkdown document^[[https://github.com/SESjo/shiny_101/blob/main/notebooks/quarto_shiny.qmd](https://github.com/SESjo/shiny_101/blob/main/notebooks/quarto_shiny.qmd)]
 
 ## Alternatives
 
--   Plotly/Highcharts
--   Observable
--   PowerBI/Tableau
+-   Data visualization framework available in R package: [Plotly](https://plotly.com/r/)/[Highcharts](https://www.highcharts.com/blog/tutorials/highcharts-for-r-users/)
+
+```{r fig-plotly}
+#| fig-cap: This is a ggplotly!
+
+# build the plot
+to_plot <- data_tdr %>% 
+  # initiate a plot
+  ggplot(aes(x = datetime, 
+             y = depth,
+             group = dive_number))+
+  # which going to be a geom_path = line plot
+  geom_path(
+      aes(col = dive_type)
+  ) +
+  ### everything below is optional ###
+  # tweak y axis
+  scale_y_reverse(
+    # a proper name
+    name = "Depth (m)",
+    # fix the limits, note: use rev because we reversed the y axis
+    limits = rev(range(data_tdr$depth))) +
+  # tweak x axis
+  scale_x_datetime(
+    # a proper name
+    name = "Time",
+    # ticks frequency
+    date_breaks = "20 mins",
+    # format of labels
+    date_labels = "%H:%M",
+    # position
+    position = "top",
+    # fix the limits
+    limits = range(data_tdr$datetime)) +
+  # tweak color
+  scale_color_manual(
+    # fix color for each dive type
+    values = c(Forage = "#00AFBB", 
+               Transit = "#E7B800", 
+               Drift = "#FC4E07")) +
+  # rename title of the legend
+  labs(col = "Dive Type", 
+       title = "Made with the R package plotly") +
+  # choose a theme
+  theme_minimal() +
+  # and tweak it
+  theme(
+    # legend position
+    legend.position = "bottom",
+    # add arrow for x axis
+    axis.line.x = element_line(arrow = arrow(
+      ends = "last",
+      type = "closed",
+      length = unit(0.25, "npc"))),
+    # add arrow for y axis
+    axis.line.y = element_line(arrow = arrow(
+      ends = "first",
+      type = "closed",
+      length = unit(0.25, "npc"))))
+
+# print it
+plotly::ggplotly(to_plot)
+```
+
+## Alternatives
+
+-   Data visualization framework available in R package: [Plotly](https://plotly.com/r/)/[Highcharts](https://www.highcharts.com/blog/tutorials/highcharts-for-r-users/)
+-   [Observable](https://observablehq.com/): powerfull notebooks with interactive visualizations
+-   Software: [PowerBI](https://powerbi.microsoft.com/en-us/)/[Tableau](https://www.tableau.com/)
 
 ## References

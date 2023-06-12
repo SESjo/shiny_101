@@ -25,7 +25,7 @@ ui <- fluidPage(
       
       ####### TO BE COMPLETED ########
       # sliderInput to choose the number of dives
-      
+      sliderInput(...),
       ################################
       
       # radioButtons to decide the color code
