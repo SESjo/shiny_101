@@ -12,7 +12,7 @@ data_tdr = read.csv2("https://raw.githubusercontent.com/SESjo/shiny_101/main/exp
                                     "numeric"))
 
 # define UI for the application
-ui <- fluidPage(
+ui <- fluidPage( 
   
   # application title
   titlePanel("TDR Data"),
