@@ -26,7 +26,7 @@ Highly inspired by [Mastering Shiny](https://mastering-shiny.org/index.html) [^1
 
 ## Shiny
 
-«*It is an open source* **R package** *that provides an elegant and powerful web framework for building* **web applications** *using R*» - [Rstudio website](#0)
+«*It is an open source* **R package** *that provides an elegant and powerful web framework for building* **web applications** *using R*» - [Rstudio website](https://www.rstudio.com/products/shiny)
 
 . . .
 
@@ -67,7 +67,7 @@ shinyApp(ui = ui, server = server)    # <4>
 3.  Back end, to define the server logic
 4.  Simply run the application
 
-## User Interface
+## User Interface{.scrollable}
 
 Always within a layout function (*e.g* `fluidPage()`) that sets up the basic visual structure of the page with:
 
@@ -78,10 +78,20 @@ Always within a layout function (*e.g* `fluidPage()`) that sets up the basic vis
 ui <- fluidPage(                      
   selectInput(inputId = "dataset", 
               label = "Dataset", 
-              choices = c("data_tdr", "other")),
+              choices = c("data_tdr", "cars")),
   tableOutput(outputId = "table")
 )                                     
 ```
+
+:::{.aside}
+<details><summary>Click here for the visual</summary>
+<p>
+
+![](https://i.imgur.com/CsgTcpa.png)
+
+</p>
+</details>
+:::
 
 ## User Interface {.smaller}
 
@@ -138,6 +148,7 @@ writing a script *vs.* reactive programming
 «The key idea of reactive programming is to specify a graph of dependencies so that when an **input** changes, all related **outputs** are automatically updated»^[[https://mastering-shiny.org/basic-reactivity.html](https://mastering-shiny.org/basic-reactivity.html)]
 :::
 
+
 ## Server Logic{.smaller}
 
   - The `server()` function takes three parameters: `input`, `output` and `session`
@@ -145,6 +156,82 @@ writing a script *vs.* reactive programming
   - Always use the `output` object in concert with a `render()` function
   
 . . .
+  
+```{.r}
+ui <- fluidPage(
+
+
+
+
+)
+server <- function(input, output, session) {
+
+
+}
+```
+
+## Server Logic{.smaller}
+
+  - The `server()` function takes three parameters: `input`, `output` and `session`
+  - The `input` and `output` are list-like objects that contain respectively all the input data sent from the user interface and all the output from the `server()`
+  - Always use the `output` object in concert with a `render()` function
+  
+```{.r}
+ui <- fluidPage(
+
+
+
+
+)
+server <- function(input, output, session) {
+  output$message <- 
+                                          input$count
+}
+```
+
+## Server Logic{.smaller}
+
+  - The `server()` function takes three parameters: `input`, `output` and `session`
+  - The `input` and `output` are list-like objects that contain respectively all the input data sent from the user interface and all the output from the `server()`
+  - Always use the `output` object in concert with a `render()` function
+  
+```{.r}
+ui <- fluidPage(
+  
+                
+                          
+
+)
+server <- function(input, output, session) {
+  output$message <- renderText(
+                                          input$count)
+}
+```
+
+## Server Logic{.smaller}
+
+  - The `server()` function takes three parameters: `input`, `output` and `session`
+  - The `input` and `output` are list-like objects that contain respectively all the input data sent from the user interface and all the output from the `server()`
+  - Always use the `output` object in concert with a `render()` function
+  
+```{.r}
+ui <- fluidPage(
+  numericInput(inputId = "count", 
+               
+                          ),
+  textOutput(outputId = "message")
+)
+server <- function(input, output, session) {
+  output$message <- renderText(
+                                          input$count)
+}
+```
+
+## Server Logic{.smaller}
+
+  - The `server()` function takes three parameters: `input`, `output` and `session`
+  - The `input` and `output` are list-like objects that contain respectively all the input data sent from the user interface and all the output from the `server()`
+  - Always use the `output` object in concert with a `render()` function
   
 ```{.r}
 ui <- fluidPage(
@@ -163,7 +250,7 @@ server <- function(input, output, session) {
 
 ## Practice{.smaller}
 
-The dataset
+The `data_tdr` dataset
 
 ```{r}
 #| echo: false
@@ -213,13 +300,13 @@ The app
 
 ![](https://i.imgur.com/uGiBN8c.png)
 
-## Practice - Your turn{.smaller}
+## Practice - Your turn{.smaller .scrollable}
 
 1. Create a new script: `File > New File > R Script`
 2. Paste the code below
-3. Save it
-4. Fill the `####### TO BE COMPLETED ########` sections
-5. Run it
+3. Fill the `####### TO BE COMPLETED ########` sections
+4. Save it
+5. Click on the `Run App` button at the top right of your script
 
 ```{.r}
 # load packages
@@ -352,6 +439,23 @@ server <- function(input, output) {
 shinyApp(ui = ui, server = server)
 ```
 
+:::{.aside}
+<details><summary>Click here for the answer</summary>
+<p>
+
+```{.r}
+# the slider
+sliderInput(inputId = "nb_dives",
+            label = "Number of dives:",
+            min = 1,
+            max = 10,
+            value = 1),
+# the filter
+filter(dive_type %in% input$dive_type) %>%
+```
+</p>
+</details>
+:::
 
 ## Showcase your app
 
